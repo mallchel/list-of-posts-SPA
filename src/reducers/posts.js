@@ -1,16 +1,12 @@
-const posts = (state = [], action) => {
+import Immutable from 'immutable'
+
+const posts = (state = Immutable.Map(), action) => {
   switch (action.type) {
-    case 'getPosts':
-      return [
-        ...state,
-        {
-          id: 'action.id',
-          text: 'action.text',
-          completed: false
-        }
-      ];
-    case 'getComments':
-      return state.map(todo => todo);
+    case 'REQUEST_POSTS':
+      return state.set('isFetching', true);
+    case 'RECEIVE_POSTS':
+      return state.set('isFetching', false)
+        .set('items', Immutable.fromJS(action.posts));
     default:
       return state;
   }
