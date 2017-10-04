@@ -1,5 +1,13 @@
 import fetch from 'isomorphic-fetch'
 
+function status(response) {
+  if (!response.ok) {
+    return Promise.reject(new Error(response.status));
+  } else {
+    return Promise.resolve(response.json());
+  }
+}
+
 export const requestPosts = () => ({
   type: 'REQUEST_POSTS',
 });
@@ -10,11 +18,16 @@ export const receivePosts = (json) => ({
   receivedAt: Date.now(),
 });
 
+export const requestPostsFailed = () => ({
+  type: 'REQUEST_POSTS_FAILED',
+});
+
 export const fetchPosts = () => dispatch => {
   dispatch(requestPosts());
   return fetch('https://jsonplaceholder.typicode.com/posts')
-    .then(response => response.json())
-    .then(json => dispatch(receivePosts(json)));
+    .then(status)
+    .then(json => dispatch(receivePosts(json)))
+    .catch(error => dispatch(requestPostsFailed()));
 }
 
 export const requestComments = () => ({
@@ -28,9 +41,14 @@ export const receiveComments = (postId, json) => ({
   receivedAt: Date.now(),
 });
 
+export const requestCommentsFailed = () => ({
+  type: 'REQUEST_COMMENTS_FAILED',
+});
+
 export const fetchComments = postId => dispatch => {
   dispatch(requestComments());
   return fetch(`https://jsonplaceholder.typicode.com/comments?postId=${postId}`)
-    .then(response => response.json())
-    .then(json => dispatch(receiveComments(postId, json)));
+    .then(status)
+    .then(json => dispatch(receiveComments(postId, json)))
+    .catch(error => dispatch(requestCommentsFailed()));
 }

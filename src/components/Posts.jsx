@@ -9,11 +9,17 @@ class Posts extends Component {
     this.props.dispatch(fetchPosts());
   }
 
-  onClick = (postId) => {
+  onSelect = (postId, e) =>{
     this.props.dispatch(fetchComments(postId));
   }
 
   render() {
+    const requestPostsFailed = this.props.posts.get('failed');
+
+    if (requestPostsFailed) {
+      return <div>Ошибка загрузки данных</div>
+    }
+
     if (!this.props.posts.get('items')) {
       return <div className='loader-container'><span className='glyphicon glyphicon-refresh spin'></span></div>
     }
@@ -22,9 +28,11 @@ class Posts extends Component {
       <PanelGroup>
         {
           this.props.posts.get('items').toJS().map(post => {
-            return <Panel onClick={() => this.onClick(post.id)} key={post.id} eventKey={post.id} collapsible header={post.title}>
-              <Panel>
-                {
+            return <Panel onSelect={this.onSelect} key={post.id} eventKey={post.id} collapsible header={post.title}>
+              {
+                this.props.comments.get('failed') ?
+                  <p>Ошибка загрузки данных</p>
+                  :
                   !this.props.comments.getIn(['items', post.id]) ?
                     <div className='loader-container'><span className='glyphicon glyphicon-refresh spin'></span></div>
                     :
@@ -33,8 +41,7 @@ class Posts extends Component {
                         {comment.body}
                       </p>
                     })
-                }
-              </Panel>
+              }
             </Panel>
           })
         }

@@ -7,6 +7,8 @@ const posts = (state = Immutable.Map(), action) => {
     case 'RECEIVE_POSTS':
       return state.set('isFetching', false)
         .set('items', Immutable.fromJS(action.posts));
+    case 'REQUEST_POSTS_FAILED':
+      return state.set('failed', true);
     default:
       return state;
   }

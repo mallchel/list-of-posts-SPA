@@ -7,6 +7,8 @@ const comments = (state = Immutable.Map(), action) => {
     case 'RECEIVE_COMMENTS':
       return state.set('isFetching', false)
         .setIn(['items', action.postId], Immutable.fromJS(action.comments));
+    case 'REQUEST_COMMENTS_FAILED':
+      return state.set('failed', true);
     default:
       return state;
   }
